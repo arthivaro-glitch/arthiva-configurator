@@ -1297,9 +1297,66 @@ export default function App() {
   const accent = STEP_ACCENTS[step] || C.salmon;
   const grandTotal = calcGrandTotal(data);
 
-  function handleSubmit() {
-    // In production: POST to backend / email service
-    setSubmitted(true);
+  async function handleSubmit() {
+    const grandTotal = calcGrandTotal(data);
+    const hasAlbum   = data.albume.some(a => a.size);
+    const hasMozaic  = data.mozaice.some(m => m.size);
+    const hasAlbOrMoz = hasAlbum || hasMozaic;
+
+    // Build order summary text
+    const albumLines = data.albume
+      .filter(a => a.size)
+      .map((a,i) => `Album ${i+1}: ${a.size} | Copil: ${a.numeCopil||"-"} | Titlu: ${a.titlu||"-"} | Copii: ${a.numarCopii} | Pret: ${albumPrice(a)} LEI`)
+      .join("\n");
+
+    const mozaicLines = data.mozaice
+      .filter(m => m.size)
+      .map((m,i) => `Mozaic ${i+1}: ${m.size} | Copil: ${m.numeCopil||"-"} | Rama: ${m.frame} | Copii: ${m.numarCopii} | Pret: ${mozaicPrice(m, hasAlbum)} LEI`)
+      .join("\n");
+
+    const amintiriLines = data.articole
+      .map((a,i) => `Articol ${i+1}: ${a.tip} | ${a.tipPersonalizare} | Marime: ${a.marime||"-"} | Culoare: ${a.numeCuloare||a.culoare} | Copii: ${a.numarCopii} | Pret: ${articolPrice(a, hasAlbOrMoz)} LEI`)
+      .join("\n");
+
+    const galerieText = data.galerie === "abonament"
+      ? `Abonament lunar - ${data.galerieNrLucrari} lucrari - ${galleryPriceForCount(data.galerieNrLucrari)} LEI/luna`
+      : "1 luna gratuit";
+
+    const metodaContact = Array.isArray(data.contact.metodaContact)
+      ? data.contact.metodaContact.join(", ")
+      : data.contact.metodaContact;
+
+    const payload = {
+      "Nume": data.contact.nume,
+      "Telefon": data.contact.telefon,
+      "Email": data.contact.email,
+      "Metoda contact": metodaContact,
+      "Newsletter": data.contact.newsletter,
+      "Lucrari originale": data.contact.lucrariOriginale === "inapoi" ? "Le vrea inapoi" : "Nu le mai vrea",
+      "ALBUM": albumLines || "Niciun album",
+      "Note album": data.notesAlbum || "-",
+      "MOZAIC": mozaicLines || "Niciun mozaic",
+      "Note mozaic": data.notesMozaic || "-",
+      "AMINTIRI 2 GO": amintiriLines || "Niciun articol",
+      "Note amintiri": data.notesAmintiri || "-",
+      "GALERIE DIGITALA": galerieText,
+      "TOTAL COMANDA": `${grandTotal} LEI`,
+    };
+
+    try {
+      const res = await fetch("https://formspree.io/f/xnjwqvbk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) {
+        setSubmitted(true);
+      } else {
+        alert("A apărut o eroare. Te rugăm să încerci din nou sau să ne contactezi direct.");
+      }
+    } catch(e) {
+      alert("A apărut o eroare de rețea. Te rugăm să încerci din nou.");
+    }
   }
 
   if (page === "home") {
