@@ -1199,15 +1199,25 @@ const optionRowStyle = {
 // ════════════════════════════════════════════════════════════════════
 function HomePage({ onStart }) {
   return (
-    <div style={{ minHeight:"100vh", background:C.cream, fontFamily:"'Nunito', 'Segoe UI', sans-serif" }}>
-      {/* Hero */}
-      <div style={{ textAlign:"center", padding:"60px 24px 40px", position:"relative", overflow:"hidden" }}>
+    <div style={{ background:C.cream, fontFamily:"'Nunito', 'Segoe UI', sans-serif" }}>
+      <style>{`
+        @keyframes bounce {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(8px); }
+        }
+      `}</style>
+      {/* Hero — full screen */}
+      <div style={{
+        minHeight:"100vh", textAlign:"center",
+        padding:"0 24px", position:"relative", overflow:"hidden",
+        display:"flex", flexDirection:"column", justifyContent:"center", alignItems:"center",
+      }}>
         {/* Decorative blobs */}
         <div style={{ position:"absolute", top:40, left:20, width:120, height:120, borderRadius:"50%", background:"#2FADD5", opacity:.15 }} />
         <div style={{ position:"absolute", top:80, right:30, width:90, height:90, borderRadius:"50%", background:"#FF8762", opacity:.18 }} />
         <div style={{ position:"absolute", bottom:20, left:10, width:140, height:140, borderRadius:"50%", background:"#FFD66D", opacity:.18 }} />
         <div style={{ position:"absolute", bottom:40, right:10, width:80, height:80, borderRadius:"50%", background:"#DFA1EA", opacity:.20 }} />
-        <div style={{ position:"absolute", top:160, left:"40%", width:60, height:60, borderRadius:"50%", background:"#60FFCC", opacity:.22 }} />
+        <div style={{ position:"absolute", top:"40%", left:"40%", width:60, height:60, borderRadius:"50%", background:"#60FFCC", opacity:.22 }} />
 
         {/* Logo */}
         <div style={{ marginBottom:28, position:"relative", zIndex:1 }}>
@@ -1234,6 +1244,11 @@ function HomePage({ onStart }) {
         <p style={{ color:C.gray400, fontSize:13, marginTop:16, position:"relative", zIndex:1 }}>
           Durează ~2 minute · Poți seta 0 dacă nu dorești un produs
         </p>
+
+        {/* Scroll indicator */}
+        <div style={{ position:"absolute", bottom:24, left:"50%", transform:"translateX(-50%)", zIndex:1, opacity:.5 }}>
+          <div style={{ fontSize:20, animation:"bounce 2s infinite" }}>↓</div>
+        </div>
       </div>
 
       {/* How it works */}
